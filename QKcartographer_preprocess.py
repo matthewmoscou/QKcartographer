@@ -28,7 +28,8 @@ import string
 
 
 # import arguments and options
-parser = OptionParser()
+usage = "usage: %prog prefix population_type phenotypes genotypes"
+parser = OptionParser(usage=usage)
 (options, args) = parser.parse_args()
 
 
@@ -41,6 +42,7 @@ trait_file = open(args[2], 'r')
 
 number_individuals = -1
 traits = {}
+traits_order = []
 
 for line in trait_file.readlines():
 	sline = string.split(line)
@@ -50,6 +52,7 @@ for line in trait_file.readlines():
 			print 'Unequal individuals observed in trait:', sline[0]
 
 	traits[sline[0]] = sline[1:]
+	traits_order.append(sline[0])
 
 	number_individuals = len(sline[1:])
 
@@ -68,14 +71,15 @@ chromosome_markers = {}
 truth = False
 
 for line in genetic_map_file.readlines():
-	sline = string.split(line)
+	line = string.replace(line, '\n', '')
+	sline = string.split(line, '\t')
 	
 	if truth:
 		mapped_markers.append(sline[0])
 		marker_distance[sline[0]] = float(sline[2])
 
 		if sline[1] not in chromosome_markers.keys():
-			chromosome_markers[i] = []
+			chromosome_markers[sline[1]] = []
 
 		chromosome_markers[sline[1]].append(sline[0])
 		genetic_map.append([sline[0], sline[3:]])
@@ -83,6 +87,8 @@ for line in genetic_map_file.readlines():
 		if population_size != len(sline[3:]):
 			print 'Unequal progeny in population at marker ' + sline[0]
 
+		population_size = len(sline[3:])
+	else:
 		population_size = len(sline[3:])
 
 	truth = True
@@ -129,7 +135,7 @@ rcross_output = open(args[0] + '_Rcross.inp', 'w')
 
 rcross_output.write('# 6588597 -filetype cross.inp' + '\n')
 rcross_output.write('-SampleSize ' + str(population_size) + '\n')
-rcross_output.write('-Cross ' args[1] + '\n')
+rcross_output.write('-Cross ' + args[1] + '\n')
 rcross_output.write('-traits ' + str(len(traits.keys())) + '\n')
 rcross_output.write('-missingtrait -' + '\n')
 rcross_output.write('-case yes' + '\n')
@@ -173,7 +179,7 @@ rcross_output.write('-missingtrait -' + '\n')
 
 rcross_output.write('-start traits' + '\n')
 
-for phenotype in traits.keys():
+for phenotype in traits_order:
 	rcross_output.write(phenotype)
 
 	for trait_element in traits[phenotype]:
