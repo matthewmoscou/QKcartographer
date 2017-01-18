@@ -29,3 +29,10 @@ do
 	mv qtlcart.z qtlcart_$i.z
 done
 ```
+
+Example set of commands to run the set of scripts:
+```bash
+python QKcartographer_preprocess.py DxM SF2 DxM_phenotypic_data.txt DxM_genetic_map.txt
+bash permutation.sh
+python QKcartographer_permutations_F2.py 0.95 1000
+```
