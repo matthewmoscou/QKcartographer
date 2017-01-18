@@ -10,16 +10,22 @@ This performs the following:
    2. Exports all peak QTL for additional analysis
    3. Exports experiment-wise thresholds based on alpha
 
-Improvements from existing script set (13 January 2017):
+Improvements from existing script set:
 
 Future improvements to include:
 """
 
+# modules
 import math
 from math import modf
 
+import optparse
+from optparse import OptionParser
+
 import string
 
+
+# functions
 def quantile(data, k, presorted=False):
 	__abstract__  = 'miscellaneous statistical functions'
 	__copyright__ = 'Copyright (c) 2007-2009, BioInformed LLC and the U.S. Department of Health & Human Services. Funded by NCI under Contract N01-CO-12400.'
@@ -69,6 +75,12 @@ def quantile(data, k, presorted=False):
 	return q
 
 
+# import arguments and options
+usage = "usage: %prog prefix alpha number_of_permutations"
+parser = OptionParser(usage=usage)
+(options, args) = parser.parse_args()
+
+
 # read data from individual permutations
 stem = 'qtlcart'
 
@@ -78,7 +90,7 @@ traits = []
 trait = ''
 
 for i in range(0,int(args[1])):
-	permutation = open(stem + '_' + str(i) + '.z', 'r')
+	permutation = open('permutations/' + stem + '_' + str(i) + '.z', 'r')
 	line = permutation.readline()
 
 	start = False
