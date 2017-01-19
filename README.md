@@ -1,13 +1,13 @@
 # QKcartographer
 A set of scripts for processing QTL Cartographer output.
 
-QKcartographer_preprocess.py converts tabular flat text files into formatted input files for QTL Cartographer.
+<i>QKcartographer_preprocess.py</i> converts tabular flat text files into formatted input files for QTL Cartographer.
 
-QKcartographer_permutations_F2.py identifies experiment-wise thresholds based on permuted data sets from QTL Cartographer.
+<i>QKcartographer_permutations_F2.py</i> identifies experiment-wise thresholds based on permuted data sets from QTL Cartographer.
 
-QKcartographer_visualization.py generates figures in PNG or postscript format for publication purposes.
+<i>QKcartographer_visualization.py</i> generates figures in PNG or postscript format for publication purposes.
 
-QKcartographer_epistasis.py parses QTL Cartographer output files and permits curation of significant QTLs. Optional command to generate scripts for epistasis analysis with Rqtl.
+<i>QKcartographer_epistasis.py</i> parses QTL Cartographer output files and permits curation of significant QTLs. Optional command to generate scripts for epistasis analysis with R/qtl.
 
 Permutations for composite interval mapping can be performed using the following bash shell commands:
 
