@@ -8,12 +8,14 @@ QKcartographer_permutations_F2.py identifies experiment-wise thresholds based on
 Permutations for composite interval mapping can be performed using the following bash shell commands:
 
 ```bash
+mkdir permutations
+
 for ((  i = 0 ;  i < 1000;  i++  ))
 do
   ~/bin/Prune -A -i qtlcart.cro -b 2 -t 100 -V
 	~/bin/SRmapqtl -A -i qtlcart.crb -t 100 -u 5 -M 2 -V
 	~/bin/Zmapqtl -A -i qtlcart.crb -t 1000 -M 6 -V
-	mv qtlcart.z qtlcart_$i.z
+	mv qtlcart.z permutations/qtlcart_$i.z
 done
 ```
 
@@ -22,11 +24,13 @@ In this case, permutations are performed with reselection, where SRmapqtl is ran
 For interval mapping, the bash shell commands are the following:
 
 ```bash
+mkdir permutations
+
 for ((  i = 0 ;  i < 1000;  i++  ))
 do
   ~/bin/Prune -A -i qtlcart.cro -b 2 -t 100 -V
 	~/bin/Zmapqtl -A -i qtlcart.crb -t 1000 -M 3 -V
-	mv qtlcart.z qtlcart_$i.z
+	mv qtlcart.z permutations/qtlcart_$i.z
 done
 ```
 
@@ -35,4 +39,5 @@ Example set of commands to run the set of scripts:
 python QKcartographer_preprocess.py DxM SF2 DxM_phenotypic_data.txt DxM_genetic_map.txt
 bash permutation.sh
 python QKcartographer_permutations_F2.py 0.95 1000
+python QKcartographer_visualization.py DxM SF2 0.95
 ```
