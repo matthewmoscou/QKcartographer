@@ -17,9 +17,9 @@ mkdir permutations
 for ((  i = 0 ;  i < 1000;  i++  ))
 do
   ~/bin/Prune -A -i qtlcart.cro -b 2 -t 100 -V
-	~/bin/SRmapqtl -A -i qtlcart.crb -t 100 -u 5 -M 2 -V
-	~/bin/Zmapqtl -A -i qtlcart.crb -t 1000 -M 6 -V
-	mv qtlcart.z permutations/qtlcart_$i.z
+  ~/bin/SRmapqtl -A -i qtlcart.crb -t 100 -u 5 -M 2 -V
+  ~/bin/Zmapqtl -A -i qtlcart.crb -t 1000 -M 6 -V
+  mv qtlcart.z permutations/qtlcart_$i.z
 done
 ```
 
@@ -33,8 +33,8 @@ mkdir permutations
 for ((  i = 0 ;  i < 1000;  i++  ))
 do
   ~/bin/Prune -A -i qtlcart.cro -b 2 -t 100 -V
-	~/bin/Zmapqtl -A -i qtlcart.crb -t 1000 -M 3 -V
-	mv qtlcart.z permutations/qtlcart_$i.z
+  ~/bin/Zmapqtl -A -i qtlcart.crb -t 1000 -M 3 -V
+  mv qtlcart.z permutations/qtlcart_$i.z
 done
 ```
 
@@ -44,4 +44,5 @@ python QKcartographer_preprocess.py DxM SF2 DxM_phenotypic_data.txt DxM_genetic_
 bash permutation.sh
 python QKcartographer_permutations_F2.py 0.95 1000
 python QKcartographer_visualization.py DxM SF2 0.95
+python QKcartographer_visualization.py SF2 0.95
 ```
