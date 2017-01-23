@@ -32,7 +32,7 @@ bash permutation.sh
 
 python QKcartographer_permutations_F2.py 0.95 1000
 python QKcartographer_visualization.py DxM SF2 0.95
-python QKcartographer_visualization.py SF2 0.95
+python QKcartographer_epistasis.py SF2 0.95
 ```
 This example uses a genetic map with cM positions generated using the Kosambi function.
 
