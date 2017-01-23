@@ -1,6 +1,7 @@
 # QKcartographer
 A set of scripts for processing QTL Cartographer output.
 
+## Scripts
 <i>QKcartographer_preprocess.py</i> converts tabular flat text files into formatted input files for QTL Cartographer.
 
 <i>QKcartographer_permutations_F2.py</i> identifies experiment-wise thresholds based on permuted data sets from QTL Cartographer.
@@ -9,6 +10,33 @@ A set of scripts for processing QTL Cartographer output.
 
 <i>QKcartographer_epistasis.py</i> parses QTL Cartographer output files and permits curation of significant QTLs. Optional command to generate scripts for epistasis analysis with R/qtl.
 
+## Example
+Example set of commands to run the set of scripts in Linux:
+```bash
+python QKcartographer_preprocess.py DxM SF2 DxM_phenotypic_data.txt DxM_genetic_map.txt
+
+mkdir analysis
+
+Rmap -A -i DxM_Rmap.inp -f 2 -V
+Rcross -A -i DxM_Rcross.inp -V
+SRmapqtl -A -i qtlcart.cro -t 1000 -u 5 -M 2 -V
+Zmapqtl -A -i qtlcart.cro -t 1000 -M 6 -V
+Eqtl -A -S 8 -H 10 -M 6 -V
+mv qtlcart.eqt analysis/qtlcart_H0H1.eqt
+Eqtl -A -S 8 -H 30 -M 6 -V
+mv qtlcart.eqt analysis/qtlcart_H0H3.eqt
+cp qtlcart.cro qtlcart.map qtlcart.sr qtlcart.z analysis/
+rm qtlcart.sr qtlcart.z
+
+bash permutation.sh
+
+python QKcartographer_permutations_F2.py 0.95 1000
+python QKcartographer_visualization.py DxM SF2 0.95
+python QKcartographer_visualization.py SF2 0.95
+```
+This example uses a genetic map with cM positions generated using the Kosambi function.
+
+## Permutations
 Permutations for composite interval mapping can be performed using the following bash shell commands:
 
 ```bash
@@ -36,13 +64,4 @@ do
   ~/bin/Zmapqtl -A -i qtlcart.crb -t 1000 -M 3 -V
   mv qtlcart.z permutations/qtlcart_$i.z
 done
-```
-
-Example set of commands to run the set of scripts:
-```bash
-python QKcartographer_preprocess.py DxM SF2 DxM_phenotypic_data.txt DxM_genetic_map.txt
-bash permutation.sh
-python QKcartographer_permutations_F2.py 0.95 1000
-python QKcartographer_visualization.py DxM SF2 0.95
-python QKcartographer_visualization.py SF2 0.95
 ```
