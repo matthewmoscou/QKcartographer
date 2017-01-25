@@ -28,7 +28,7 @@ mv qtlcart.eqt analysis/qtlcart_H0H3.eqt
 cp qtlcart.cro qtlcart.map qtlcart.sr qtlcart.z analysis/
 rm qtlcart.sr qtlcart.z
 
-bash permutation.sh
+bash permutations.sh
 
 python QKcartographer_permutations_F2.py 0.95 1000
 python QKcartographer_visualization.py DxM SF2 0.95
