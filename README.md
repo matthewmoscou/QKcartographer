@@ -1,5 +1,5 @@
 # QKcartographer
-A set of scripts for processing QTL Cartographer output.
+A set of scripts for processing output from QTL Cartographer. The current set of scripts are built around analyzing an F2 population. Adaptation for doubled-haploid and recombinant inbred line populations is current underway.
 
 ## Scripts
 <i>QKcartographer_preprocess.py</i> converts tabular flat text files into formatted input files for QTL Cartographer.
