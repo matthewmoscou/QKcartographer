@@ -83,15 +83,15 @@ parser = OptionParser(usage=usage)
 
 # read data from individual permutations
 stem = 'qtlcart'
-
 trait_test_maximum_value = {}
-hypothesis_tests = ['H0:H3', 'H1:H3', 'H2:H3', 'H0:H1', 'H0:H2']
 traits = []
+initialization = False
 trait = ''
 
 for i in range(0,int(args[1])):
 	permutation = open('permutations/' + stem + '_' + str(i) + '.z', 'r')
 	line = permutation.readline()
+	sline = string.split(line)
 
 	start = False
 	
@@ -100,55 +100,63 @@ for i in range(0,int(args[1])):
 			if line in ['-Model           6      Model number\n', '-Model           3      Model number\n']:
 				line = permutation.readline()
 				sline = string.split(line)
-			
-				if i == 0 and len(trait) > 1:
-					traits.append(trait)
-					trait_test_maximum_value[trait] = {}
-					trait_test_maximum_value[trait]['H0:H3'] = [maximum_value[0]]
-					trait_test_maximum_value[trait]['H1:H3'] = [maximum_value[1]]
-					trait_test_maximum_value[trait]['H2:H3'] = [maximum_value[2]]
-					trait_test_maximum_value[trait]['H0:H1'] = [maximum_value[3]]
-					trait_test_maximum_value[trait]['H0:H2'] = [maximum_value[4]]
-				elif len(trait) > 1:
-					trait_test_maximum_value[trait]['H0:H3'].append(maximum_value[0])
-					trait_test_maximum_value[trait]['H1:H3'].append(maximum_value[1])
-					trait_test_maximum_value[trait]['H2:H3'].append(maximum_value[2])
-					trait_test_maximum_value[trait]['H0:H1'].append(maximum_value[3])
-					trait_test_maximum_value[trait]['H0:H2'].append(maximum_value[4])
-				
 				trait = sline[4][1:len(sline[4])-1]
-				maximum_value = [0.0, 0.0, 0.0, 0.0, 0.0]
+			
+				line = permutation.readline()
+				sline = string.split(line)
+
+				# need to fix how maximum value is called!
+				if i == 0:
+					if sline[1] in ['RI0', 'RI1']:
+						hypothesis_tests = ['H0:H1']
+						positions = [3]
+					elif sline[1][0] in ['B']:
+						hypothesis_tests = ['H0:H1']
+						positions = [3]
+					elif sline[1][0] in ['S']:
+						hypothesis_tests = ['H0:H3', 'H1:H3', 'H2:H3', 'H0:H1', 'H0:H2']
+						positions = [3, 4, 5, 10, 11]
+
+				
+				maximum_value = []
+
+				for test in range(len(hypothesis_tests)):
+					maximum_value.append(0.0)
+
+				initialization = True
 
 			if line == '-s\n':
 				start = True
 				line = permutation.readline()
 			if line == '-e\n':
 				start = False
-				
+
+				if i == 0:
+					traits.append(trait)
+					trait_test_maximum_value[trait] = {}
+
+					for test in range(len(hypothesis_tests)):
+						trait_test_maximum_value[trait][hypothesis_tests[test]] = [maximum_value[test]]
+				else:
+					for test in range(len(hypothesis_tests)):
+						trait_test_maximum_value[trait][hypothesis_tests[test]].append(maximum_value[test])
+
 			if start:
 				sline = string.split(line)
 
-				if float(sline[3]) > maximum_value[0]:
-					maximum_value[0] = float(sline[3])
-				if float(sline[4]) > maximum_value[1]:
-					maximum_value[1] = float(sline[4])
-				if float(sline[5]) > maximum_value[2]:
-					maximum_value[2] = float(sline[5])
-				if float(sline[10]) > maximum_value[3]:
-					maximum_value[3] = float(sline[10])
-				if float(sline[11]) > maximum_value[4]:
-					maximum_value[4] = float(sline[11])
+				for position_index in range(len(positions)):
+					if float(sline[positions[position_index]]) > maximum_value[position_index]:
+						maximum_value[position_index] = float(sline[positions[position_index]])
 
 		line = permutation.readline()
+		sline = string.split(line)
 			
 	if i == 0:
 		traits.append(trait)
 		trait_test_maximum_value[trait] = {}
-		trait_test_maximum_value[trait]['H0:H3'] = [maximum_value[0]]
-		trait_test_maximum_value[trait]['H1:H3'] = [maximum_value[1]]
-		trait_test_maximum_value[trait]['H2:H3'] = [maximum_value[2]]
-		trait_test_maximum_value[trait]['H0:H1'] = [maximum_value[3]]
-		trait_test_maximum_value[trait]['H0:H2'] = [maximum_value[4]]
+
+		for test in range(len(hypothesis_tests)):
+			trait_test_maximum_value[trait][hypothesis_tests[test]] = [maximum_value[test]]
 
 # export most significant QTL for every permutation and trait
 maximum_likelihood = open(stem + '.maximum_likelihood_1000', 'w')
