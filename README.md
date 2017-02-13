@@ -4,7 +4,7 @@ A set of scripts for processing output from QTL Cartographer. The current set of
 ## Scripts
 <i>QKcartographer_preprocess.py</i> converts tabular flat text files into formatted input files for QTL Cartographer.
 
-<i>QKcartographer_permutations_F2.py</i> identifies experiment-wise thresholds based on permuted data sets from QTL Cartographer.
+<i>QKcartographer_permutations.py</i> identifies experiment-wise thresholds based on permuted data sets from QTL Cartographer.
 
 <i>QKcartographer_visualization.py</i> generates figures in PNG or postscript format for publication purposes.
 
@@ -30,7 +30,7 @@ rm qtlcart.sr qtlcart.z
 
 bash permutations.sh
 
-python QKcartographer_permutations_F2.py 0.95 1000
+python QKcartographer_permutations.py 0.95 1000
 python QKcartographer_visualization.py DxM SF2 0.95
 python QKcartographer_epistasis.py SF2 0.95
 ```
