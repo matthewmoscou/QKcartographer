@@ -30,9 +30,9 @@ rm qtlcart.sr qtlcart.z
 
 bash permutations.sh
 
-python QKcartographer_permutations.py 0.95 1000
+python QKcartographer_permutations.py DxM 0.95 1000
 python QKcartographer_visualization.py DxM SF2 0.95
-python QKcartographer_epistasis.py SF2 0.95
+python QKcartographer_epistasis.py DxM SF2 0.95
 ```
 This example uses a genetic map with cM positions generated using the Kosambi function.
 
