@@ -34,11 +34,6 @@ import sets
 import string
 
 
-## global variables
-# hypothesis test information
-hypothesis_tests_short = ['30', '31', '32', '10', '20']
-hypothesis_tests = ['H0:H3', 'H1:H3', 'H2:H3', 'H0:H1', 'H0:H2']
-
 # color palettes
 palette = ["#D55E00", "#F0E442", "#009E73", "#E69F00", "#56B4E9"]
 color_name = ['Vermillion', 'Yellow', 'Bluish green', 'Orange', 'Sky blue']
@@ -70,6 +65,15 @@ def str_vector(float_vector):
 	return string_vector
 
 
+# set population type for analysis
+if args[1] in ['RI0', 'RI1']:
+	hypothesis_tests = ['H0:H1']
+elif args[1][0] in ['B']:
+	hypothesis_tests = ['H0:H1']
+elif args[1][0] in ['S']:
+	hypothesis_tests = ['H0:H3', 'H1:H3', 'H2:H3', 'H0:H1', 'H0:H2']
+
+
 # set working directory
 filename = 'QTL_' + args[0] + '_' + args[1]
 
@@ -94,7 +98,10 @@ for line in max_likelihood_file.readlines():
 
 		traits.append(sline[0])
 
-		trait_hypothesis_likelihood[sline[0]] = [float(sline[1]), float(sline[2]), float(sline[3]), float(sline[4]), float(sline[5])]
+		trait_hypothesis_likelihood[sline[0]] = []
+
+		for hypothesis_index in range(1, len(hypothesis_tests) + 1):
+			trait_hypothesis_likelihood[sline[0]].append(float(sline[hypothesis_index]))
 	
 	truth = True
 
@@ -132,7 +139,11 @@ while line:
 			sline = string.split(line)
 
 			trait = sline[4][1:len(sline[4])-1]
-			trait_Zmapqtl[trait] = [[], [], [], [], [], [], [], [], [], [], []]
+
+			if len(hypothesis_tests) > 1:
+				trait_Zmapqtl[trait] = [[], [], [], [], [], [], [], [], [], [], []]
+			else:
+				trait_Zmapqtl[trait] = [[], [], [], []]
 
 		# start reading data for given trait
 		if line == '-s\n':
@@ -167,30 +178,33 @@ while line:
 			else:
 				trait_Zmapqtl[trait][2].append(float(sline[3]))
 
-			if float(sline[4]) < 0:
-				trait_Zmapqtl[trait][3].append(0.0)
-			else:
-				trait_Zmapqtl[trait][3].append(float(sline[4]))
+			if len(hypothesis_tests) > 1:
+				if float(sline[4]) < 0:
+					trait_Zmapqtl[trait][3].append(0.0)
+				else:
+					trait_Zmapqtl[trait][3].append(float(sline[4]))
+	
+				if float(sline[5]) < 0:
+					trait_Zmapqtl[trait][4].append(0.0)
+				else:
+					trait_Zmapqtl[trait][4].append(float(sline[5]))
+	
+				if float(sline[10]) < 0:
+					trait_Zmapqtl[trait][5].append(0.0)
+				else:
+					trait_Zmapqtl[trait][5].append(float(sline[10]))
+	
+				if float(sline[11]) < 0:
+					trait_Zmapqtl[trait][6].append(0.0)
+				else:
+					trait_Zmapqtl[trait][6].append(float(sline[11]))
 
-			if float(sline[5]) < 0:
-				trait_Zmapqtl[trait][4].append(0.0)
+				trait_Zmapqtl[trait][7].append(float(sline[6]))
+				trait_Zmapqtl[trait][8].append(float(sline[7]))
+				trait_Zmapqtl[trait][9].append(float(sline[8]))
+				trait_Zmapqtl[trait][10].append(float(sline[9]))
 			else:
-				trait_Zmapqtl[trait][4].append(float(sline[5]))
-
-			if float(sline[10]) < 0:
-				trait_Zmapqtl[trait][5].append(0.0)
-			else:
-				trait_Zmapqtl[trait][5].append(float(sline[10]))
-
-			if float(sline[11]) < 0:
-				trait_Zmapqtl[trait][6].append(0.0)
-			else:
-				trait_Zmapqtl[trait][6].append(float(sline[11]))
-
-			trait_Zmapqtl[trait][7].append(float(sline[6]))
-			trait_Zmapqtl[trait][8].append(float(sline[7]))
-			trait_Zmapqtl[trait][9].append(float(sline[8]))
-			trait_Zmapqtl[trait][10].append(float(sline[9]))
+				trait_Zmapqtl[trait][3].append(float(sline[6]))
 
 			# initialize cM positions for plotting
 			if initialization:
@@ -252,8 +266,12 @@ for suffix in analysis_traits:
 				if (data_point / (float(trait_hypothesis_likelihood[trait][hypothesis_index - 2]) / float(trait_hypothesis_likelihood[trait][0]))) > maximum_LOD:
 					maximum_LOD = data_point / (float(trait_hypothesis_likelihood[trait][hypothesis_index - 2]) / float(trait_hypothesis_likelihood[trait][0]))
 
-	maximum_additivity = max([abs(min(trait_Zmapqtl[trait][7])), abs(min(trait_Zmapqtl[trait][8])), max(trait_Zmapqtl[trait][7]), max(trait_Zmapqtl[trait][8])])
-	maximum_dominance = max([abs(min(trait_Zmapqtl[trait][9])), abs(min(trait_Zmapqtl[trait][10])), max(trait_Zmapqtl[trait][10]), max(trait_Zmapqtl[trait][9])])
+	if len(hypothesis_tests) > 1:
+		maximum_additivity = max([abs(min(trait_Zmapqtl[trait][7])), abs(min(trait_Zmapqtl[trait][8])), max(trait_Zmapqtl[trait][7]), max(trait_Zmapqtl[trait][8])])
+		maximum_dominance = max([abs(min(trait_Zmapqtl[trait][9])), abs(min(trait_Zmapqtl[trait][10])), max(trait_Zmapqtl[trait][10]), max(trait_Zmapqtl[trait][9])])
+	else:
+		maximum_additivity = max([abs(min(trait_Zmapqtl[trait][3])), max(trait_Zmapqtl[trait][3])])
+		
 
 	############################################################################
 	# plot graphs
@@ -310,13 +328,22 @@ for suffix in analysis_traits:
 		R_plot_graph.write('png(file="' + os.getcwd() + '/figures/' + filename + '_' + trait + '_additivity.png", width=1500, height=500)' + '\n')
 
 	# plot LRTS/LOD curve of H0:H3
-	R_plot_graph.write('plot(c' + str_vector(cM_positions) + ', c' + str_vector(trait_Zmapqtl[trait][8]) + ', type="l", xlab="", ylab="", main="", axes=F, xlim=c(' + str(max(cM_positions) * 0.038) + ', ' + str(max(cM_positions) * 0.962) + '), ylim=c(' + str(-1 * maximum_additivity) +', ' + str(maximum_additivity) + '), col="' + palette[4] + '", lwd=3)' + '\n')
+	if len(hypothesis_tests) > 1:
+		R_plot_graph.write('plot(c' + str_vector(cM_positions) + ', c' + str_vector(trait_Zmapqtl[trait][8]) + ', type="l", xlab="", ylab="", main="", axes=F, xlim=c(' + str(max(cM_positions) * 0.038) + ', ' + str(max(cM_positions) * 0.962) + '), ylim=c(' + str(-1 * maximum_additivity) +', ' + str(maximum_additivity) + '), col="' + palette[4] + '", lwd=3)' + '\n')
+	else:
+		R_plot_graph.write('plot(c' + str_vector(cM_positions) + ', c' + str_vector(trait_Zmapqtl[trait][3]) + ', type="l", xlab="", ylab="", main="", axes=F, xlim=c(' + str(max(cM_positions) * 0.038) + ', ' + str(max(cM_positions) * 0.962) + '), ylim=c(' + str(-1 * maximum_additivity) +', ' + str(maximum_additivity) + '), col="' + palette[4] + '", lwd=3)' + '\n')
 
 	R_plot_graph.write('box(lwd=3)' + '\n')
 	#R_plot_graph.write('axis(1, at = c' + str_vector(marker_positions) + ', labels=F)' + '\n')
 
 	R_plot_graph.write('lines(c(0, ' + str(max(cM_positions)) + '), c(0, 0), col="black", lwd=3)' + '\n')
-	R_plot_graph.write('lines(c' + str_vector(cM_positions) + ', c' + str_vector(trait_Zmapqtl[trait][7]) + ', col="' + palette[3] + '", lwd=3)' + '\n')
+
+	if len(hypothesis_tests) > 1:
+		R_plot_graph.write('lines(c' + str_vector(cM_positions) + ', c' + str_vector(trait_Zmapqtl[trait][7]) + ', col="' + palette[3] + '", lwd=3)' + '\n')
+		R_plot_graph.write('lines(c' + str_vector(cM_positions) + ', c' + str_vector(trait_Zmapqtl[trait][7]) + ', col="' + palette[3] + '", lwd=3)' + '\n')
+	else:
+		R_plot_graph.write('lines(c(0, ' + str(max(cM_positions)) + '), c(0, 0), col="black", lwd=3)' + '\n')
+		R_plot_graph.write('lines(c' + str_vector(cM_positions) + ', c' + str_vector(trait_Zmapqtl[trait][3]) + ', col="' + palette[3] + '", lwd=3)' + '\n')
 
 	chr_old = string.split(trait_Zmapqtl[trait][0][0], '.')[0]
 	
@@ -333,33 +360,34 @@ for suffix in analysis_traits:
 
 	############################################################################
 
-	# open PNG file for dominance plot
-	if options.postscript:
-		R_plot_graph.write('postscript(file="' + os.getcwd() + '/figures/' + filename + '_' + trait + '_dominance.ps", width=9, height=3)' + '\n')
-	else:
-		R_plot_graph.write('png(file="' + os.getcwd() + '/figures/' + filename + '_' + trait + '_dominance.png", width=1500, height=500)' + '\n')
-
-	# plot LRTS/LOD curve of H0:H3
-	R_plot_graph.write('plot(c' + str_vector(cM_positions) + ', c' + str_vector(trait_Zmapqtl[trait][10]) + ', type="l", xlab="", ylab="", main="", axes=F, xlim=c(' + str(max(cM_positions) * 0.038) + ', ' + str(max(cM_positions) * 0.962) + '), ylim=c(' + str(-1 * maximum_dominance) +', ' + str(maximum_dominance) + '), col="' + palette[4] + '", lwd=3)' + '\n')
-
-	R_plot_graph.write('box(lwd=3)' + '\n')
-	#R_plot_graph.write('axis(1, at = c' + str_vector(marker_positions) + ', labels=F)' + '\n')
-
-	R_plot_graph.write('lines(c(0, ' + str(max(cM_positions)) + '), c(0, 0), col="black", lwd=3)' + '\n')
-	R_plot_graph.write('lines(c' + str_vector(cM_positions) + ', c' + str_vector(trait_Zmapqtl[trait][9]) + ', col="' + palette[1] + '", lwd=3)' + '\n')
-
-	chr_old = string.split(trait_Zmapqtl[trait][0][0], '.')[0]
+	if len(hypothesis_tests) > 1:
+		# open PNG file for dominance plot
+		if options.postscript:
+			R_plot_graph.write('postscript(file="' + os.getcwd() + '/figures/' + filename + '_' + trait + '_dominance.ps", width=9, height=3)' + '\n')
+		else:
+			R_plot_graph.write('png(file="' + os.getcwd() + '/figures/' + filename + '_' + trait + '_dominance.png", width=1500, height=500)' + '\n')
 	
-	# determine chromosome positions
-	for position in trait_Zmapqtl[trait][0]:
-		chr_current = string.split(position, '.')[0]
+		# plot LRTS/LOD curve of H0:H3
+		R_plot_graph.write('plot(c' + str_vector(cM_positions) + ', c' + str_vector(trait_Zmapqtl[trait][10]) + ', type="l", xlab="", ylab="", main="", axes=F, xlim=c(' + str(max(cM_positions) * 0.038) + ', ' + str(max(cM_positions) * 0.962) + '), ylim=c(' + str(-1 * maximum_dominance) +', ' + str(maximum_dominance) + '), col="' + palette[4] + '", lwd=3)' + '\n')
+	
+		R_plot_graph.write('box(lwd=3)' + '\n')
+		#R_plot_graph.write('axis(1, at = c' + str_vector(marker_positions) + ', labels=F)' + '\n')
+	
+		R_plot_graph.write('lines(c(0, ' + str(max(cM_positions)) + '), c(0, 0), col="black", lwd=3)' + '\n')
+		R_plot_graph.write('lines(c' + str_vector(cM_positions) + ', c' + str_vector(trait_Zmapqtl[trait][9]) + ', col="' + palette[1] + '", lwd=3)' + '\n')
+	
+		chr_old = string.split(trait_Zmapqtl[trait][0][0], '.')[0]
 		
-		if chr_current != chr_old:
-			R_plot_graph.write('lines(c(' + str(cM_positions[trait_Zmapqtl[trait][0].index(position)]) + ', ' + str(cM_positions[trait_Zmapqtl[trait][0].index(position)]) + '), c(' + str(maximum_dominance * -1.08) + ', ' + str(maximum_dominance * 1.08) + '), col="black", lwd=3)' + '\n')
-
-		chr_old = chr_current
-
-	R_plot_graph.write('dev.off()' + '\n')
+		# determine chromosome positions
+		for position in trait_Zmapqtl[trait][0]:
+			chr_current = string.split(position, '.')[0]
+			
+			if chr_current != chr_old:
+				R_plot_graph.write('lines(c(' + str(cM_positions[trait_Zmapqtl[trait][0].index(position)]) + ', ' + str(cM_positions[trait_Zmapqtl[trait][0].index(position)]) + '), c(' + str(maximum_dominance * -1.08) + ', ' + str(maximum_dominance * 1.08) + '), col="black", lwd=3)' + '\n')
+	
+			chr_old = chr_current
+	
+		R_plot_graph.write('dev.off()' + '\n')
 
 	############################################################################
 

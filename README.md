@@ -36,6 +36,14 @@ python QKcartographer_epistasis.py SF2 0.95
 ```
 This example uses a genetic map with cM positions generated using the Kosambi function.
 
+## Supported population type
+|Design                            |Code      |Example|Description             |
+|:---------------------------------|:--------:|:-----:|:-----------------------|
+|Backcross population              |B<i>i</i> |B1     |Backcross once to mother|
+|F<i>i</i> population              |SF<i>i</i>|SF2    |F2 population           |
+|Doubled haploid population        |RI0       |RI0    |DH population           |
+|Recombinant inbred line population|RI1       |RI1    |RIL population          |
+
 ## Permutations
 Permutations for composite interval mapping can be performed using the following bash shell commands:
 

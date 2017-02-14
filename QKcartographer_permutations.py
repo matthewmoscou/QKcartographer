@@ -88,7 +88,7 @@ traits = []
 initialization = False
 trait = ''
 
-for i in range(0,int(args[1])):
+for i in range(0,int(args[2])):
 	permutation = open('permutations/' + stem + '_' + str(i) + '.z', 'r')
 	line = permutation.readline()
 	sline = string.split(line)
@@ -105,7 +105,6 @@ for i in range(0,int(args[1])):
 				line = permutation.readline()
 				sline = string.split(line)
 
-				# need to fix how maximum value is called!
 				if i == 0:
 					if sline[1] in ['RI0', 'RI1']:
 						hypothesis_tests = ['H0:H1']
@@ -151,13 +150,6 @@ for i in range(0,int(args[1])):
 		line = permutation.readline()
 		sline = string.split(line)
 			
-	if i == 0:
-		traits.append(trait)
-		trait_test_maximum_value[trait] = {}
-
-		for test in range(len(hypothesis_tests)):
-			trait_test_maximum_value[trait][hypothesis_tests[test]] = [maximum_value[test]]
-
 # export most significant QTL for every permutation and trait
 maximum_likelihood = open(stem + '.maximum_likelihood_1000', 'w')
 
@@ -173,7 +165,7 @@ for trait in trait_test_maximum_value.keys():
 maximum_likelihood.close()
 
 # export experiment-wise treshold for every trait
-maximum_likelihood_quantile_95 = open(stem + '.maximum_likelihood_alpha_' + args[0], 'w')
+maximum_likelihood_quantile_95 = open(stem + '.maximum_likelihood_alpha_' + args[1], 'w')
 
 maximum_likelihood_quantile_95.write('trait')
 
@@ -186,7 +178,7 @@ for trait in traits:
 	maximum_likelihood_quantile_95.write(trait)
 
 	for test in hypothesis_tests:
-		maximum_likelihood_quantile_95.write('\t' + str(quantile(trait_test_maximum_value[trait][test], float(args[0]))))
+		maximum_likelihood_quantile_95.write('\t' + str(quantile(trait_test_maximum_value[trait][test], float(args[1]))))
 
 	maximum_likelihood_quantile_95.write('\n')
 
