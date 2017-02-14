@@ -57,11 +57,11 @@ parser = OptionParser(usage=usage)
 # SFX, RI0, RI1
 if len(args[0]) >= 2:
 	if args[0][:2] == 'SF':
-		tests = ['H0H1', 'H0H3']
+		hypothesis_tests = ['H0H1', 'H0H3']
 	elif args[0][:2] == 'RI':
-		tests = ['H0H1']
+		hypothesis_tests = ['H0H1']
 	elif args[0][0] == 'B':
-		tests = ['H2H3']
+		hypothesis_tests = ['H2H3']
 
 
 ### import permutations results
@@ -73,7 +73,10 @@ trait_EWT = {}
 for line in permutation_file.readlines():
 	sline = string.split(line)
 
-	trait_EWT[sline[0]] = [sline[4], sline[1]]
+	if len(hypothesis_tests) > 1:
+		trait_EWT[sline[0]] = [sline[4], sline[1]]
+	else:
+		trait_EWT[sline[0]] = [sline[1]]
 
 permutation_file.close()
 
@@ -124,7 +127,10 @@ map_file.close()
 #	Index	Trait	Chr	cM	Peak Marker	EWT	LRTS	LOD	AEE	PVE
 #	Index	Trait	Chr	cM	Peak Marker	EWT	LRTS	LOD	AEE	DEE	DEE / AEE	PVE
 traits = []
-hypothesis_trait_data = {'H0H1':{}, 'H0H3':{}}
+hypothesis_trait_data = {}
+
+for test in hypothesis_tests:
+	hypothesis_trait_data[test] = {}
 
 eqtl_file = open('analysis/qtlcart_H0H1.eqt', 'r')
 
@@ -154,33 +160,6 @@ for line in eqtl_file.readlines():
 
 eqtl_file.close()
 
-eqtl_file = open('analysis/qtlcart_H0H3.eqt', 'r')
-
-truth = True
-index = 1
-trait = ''
-
-for line in eqtl_file.readlines():
-	sline = string.split(line)
-
-	if len(sline) > 0:
-		if sline[0] == '#End':
-			truth = False
-
-	if truth:
-		if len(sline) > 2:
-			if len(trait) > 0:
-				if sline[0] != '#':
-					if float(sline[4]) > float(trait_EWT[trait][1]):
-						hypothesis_trait_data['H0H3'][trait].append([index, trait, chr_ID[sline[1]], sline[3], chr_marker_ID[sline[1]][sline[2]], trait_EWT[trait][1], sline[4], str(float(sline[4]) / LRTS_LOD), sline[5], sline[6], str(float(sline[6]) / float(sline[5])), sline[7]])
-						index += 1
-
-			if sline[2] == 'trait':
-				trait = sline[4]
-				hypothesis_trait_data['H0H3'][trait] = []
-
-eqtl_file.close()
-
 QTL_table = open('QTL_analysis_table_H0H1_draft.txt', 'w')
 
 QTL_table.write('Index' + '\t' + 'Trait' + '\t' + 'Chr' + '\t' + 'cM' + '\t' + 'Peak Marker' + '\t' + 'EWT' + '\t' + 'LRTS' + '\t' + 'LOD' + '\t' + 'AEE' + '\t' + 'PVE' + '\t' + 'Notes' + '\n')
@@ -196,18 +175,47 @@ for trait in hypothesis_trait_data['H0H1'].keys():
 
 QTL_table.close()
 
-QTL_table = open('QTL_analysis_table_H0H3_draft.txt', 'w')
+if len(hypothesis_tests) > 1:
+	eqtl_file = open('analysis/qtlcart_H0H3.eqt', 'r')
+	
+	truth = True
+	index = 1
+	trait = ''
+	
+	for line in eqtl_file.readlines():
+		sline = string.split(line)
+	
+		if len(sline) > 0:
+			if sline[0] == '#End':
+				truth = False
+	
+		if truth:
+			if len(sline) > 2:
+				if len(trait) > 0:
+					if sline[0] != '#':
+						if float(sline[4]) > float(trait_EWT[trait][1]):
+							hypothesis_trait_data['H0H3'][trait].append([index, trait, chr_ID[sline[1]], sline[3], chr_marker_ID[sline[1]][sline[2]], trait_EWT[trait][1], sline[4], str(float(sline[4]) / LRTS_LOD), sline[5], sline[6], str(float(sline[6]) / float(sline[5])), sline[7]])
+							index += 1
+	
+				if sline[2] == 'trait':
+					trait = sline[4]
+					hypothesis_trait_data['H0H3'][trait] = []
+	
+	eqtl_file.close()
 
-QTL_table.write('Index' + '\t' + 'Trait' + '\t' + 'Chr' + '\t' + 'cM' + '\t' + 'Peak Marker' + '\t' + 'EWT' + '\t' + 'LRTS' + '\t' + 'LOD' + '\t' + 'AEE' + '\t' + 'DEE' + '\t' + 'DEE / AEE' + '\t' + 'PVE' + '\t' + 'Notes' + '\n')
 
-for trait in hypothesis_trait_data['H0H3'].keys():
-	for element in hypothesis_trait_data['H0H3'][trait]:
-		line = str(element[0])
+	QTL_table = open('QTL_analysis_table_H0H3_draft.txt', 'w')
 
-		for item in element[1:]:
-			line += ('\t' + str(item))
+	QTL_table.write('Index' + '\t' + 'Trait' + '\t' + 'Chr' + '\t' + 'cM' + '\t' + 'Peak Marker' + '\t' + 'EWT' + '\t' + 'LRTS' + '\t' + 'LOD' + '\t' + 'AEE' + '\t' + 'DEE' + '\t' + 'DEE / AEE' + '\t' + 'PVE' + '\t' + 'Notes' + '\n')
 
-		QTL_table.write(line + '\n')
+	for trait in hypothesis_trait_data['H0H3'].keys():
+		for element in hypothesis_trait_data['H0H3'][trait]:
+			line = str(element[0])
+
+			for item in element[1:]:
+				line += ('\t' + str(item))
+
+			QTL_table.write(line + '\n')
 
 QTL_table.close()
 
@@ -215,7 +223,10 @@ raw_input('Press enter if QTL table has been finalized.')
 
 
 ### import finalized QTL table
-hypothesis_trait_QTL = {'H0H1':{}, 'H0H3':{}}
+hypothesis_trait_QTL = {}
+
+for test in hypothesis_tests:
+	hypothesis_trait_QTL[test] = {}
 
 QTL_table = open('QTL_analysis_table_H0H1_finished.txt', 'r')
 
@@ -235,22 +246,23 @@ while line:
 
 QTL_table.close()
 
-QTL_table = open('QTL_analysis_table_H0H3_finished.txt', 'r')
-
-line = QTL_table.readline()
-line = QTL_table.readline()
-
-while line:
-	sline = string.split(line)
-
-	if sline[1] not in hypothesis_trait_QTL['H0H3'].keys():
-		hypothesis_trait_QTL['H0H3'][sline[1]] = []
+if len(hypothesis_tests) > 1:
+	QTL_table = open('QTL_analysis_table_H0H3_finished.txt', 'r')
 	
-	hypothesis_trait_QTL['H0H3'][sline[1]].append([sline[2], sline[3]])
-
 	line = QTL_table.readline()
-
-QTL_table.close()
+	line = QTL_table.readline()
+	
+	while line:
+		sline = string.split(line)
+	
+		if sline[1] not in hypothesis_trait_QTL['H0H3'].keys():
+			hypothesis_trait_QTL['H0H3'][sline[1]] = []
+		
+		hypothesis_trait_QTL['H0H3'][sline[1]].append([sline[2], sline[3]])
+	
+		line = QTL_table.readline()
+	
+	QTL_table.close()
 
 
 ### export Rqtl epistasis analysis base script
@@ -303,40 +315,41 @@ for trait in traits:
 			R_input.write('summary(phenotype.fq)' + '\n')
 			R_input.write('\n')
 
-	R_input.write('### H0:H3' + '\n')
-
-	if trait in hypothesis_trait_QTL['H0H3'].keys():
-		if len(hypothesis_trait_QTL['H0H3'][trait]) > 1:
-			chromosome = ''
-			cM = ''
-			QTL = ''
-
-			for index in range(len(hypothesis_trait_QTL['H0H3'][trait])):
-				if index == 0:
-					chromosome += ('"' + hypothesis_trait_QTL['H0H3'][trait][index][0] + '"')
-					cM += hypothesis_trait_QTL['H0H3'][trait][index][1]
-					QTL += ('Q' + str(index + 1))
-				else:
-					chromosome += (',"' + hypothesis_trait_QTL['H0H3'][trait][index][0] + '"')
-					cM += (',' + hypothesis_trait_QTL['H0H3'][trait][index][1])
-					QTL += (' + Q' + str(index + 1))
-
-			R_input.write('chr = c(' + chromosome + ')' + '\n')
-			R_input.write('pos = c(' + cM + ')' + '\n')
-
-			for qtl_interaction in powersetOfSize(range(len(hypothesis_trait_QTL['H0H3'][trait])), 2):
-				QTL += (' + Q' + str(qtl_interaction[0] + 1) + ':Q' + str(qtl_interaction[1] + 1))
-		
-			R_input.write('phenotype.formula = y ~ ' + QTL + '\n')
-			R_input.write('\n')
-			R_input.write('qtl = makeqtl(QKdata, chr=chr, pos=pos)' + '\n')
-			R_input.write('phenotype.fq = fitqtl(QKdata, pheno.col=' + str(traits.index(trait) + 1) + ', qtl=qtl, formula=phenotype.formula)' + '\n')
-			R_input.write('summary(phenotype.fq)' + '\n')
-			R_input.write('\n')
-			R_input.write('\n')
+	if len(hypothesis_tests) > 1:
+		R_input.write('### H0:H3' + '\n')
+	
+		if trait in hypothesis_trait_QTL['H0H3'].keys():
+			if len(hypothesis_trait_QTL['H0H3'][trait]) > 1:
+				chromosome = ''
+				cM = ''
+				QTL = ''
+	
+				for index in range(len(hypothesis_trait_QTL['H0H3'][trait])):
+					if index == 0:
+						chromosome += ('"' + hypothesis_trait_QTL['H0H3'][trait][index][0] + '"')
+						cM += hypothesis_trait_QTL['H0H3'][trait][index][1]
+						QTL += ('Q' + str(index + 1))
+					else:
+						chromosome += (',"' + hypothesis_trait_QTL['H0H3'][trait][index][0] + '"')
+						cM += (',' + hypothesis_trait_QTL['H0H3'][trait][index][1])
+						QTL += (' + Q' + str(index + 1))
+	
+				R_input.write('chr = c(' + chromosome + ')' + '\n')
+				R_input.write('pos = c(' + cM + ')' + '\n')
+	
+				for qtl_interaction in powersetOfSize(range(len(hypothesis_trait_QTL['H0H3'][trait])), 2):
+					QTL += (' + Q' + str(qtl_interaction[0] + 1) + ':Q' + str(qtl_interaction[1] + 1))
+			
+				R_input.write('phenotype.formula = y ~ ' + QTL + '\n')
+				R_input.write('\n')
+				R_input.write('qtl = makeqtl(QKdata, chr=chr, pos=pos)' + '\n')
+				R_input.write('phenotype.fq = fitqtl(QKdata, pheno.col=' + str(traits.index(trait) + 1) + ', qtl=qtl, formula=phenotype.formula)' + '\n')
+				R_input.write('summary(phenotype.fq)' + '\n')
+				R_input.write('\n')
+				R_input.write('\n')
+			else:
+				R_input.write('\n')
 		else:
 			R_input.write('\n')
-	else:
-		R_input.write('\n')
 
 R_input.close()

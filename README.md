@@ -11,7 +11,7 @@ A set of scripts for processing output from QTL Cartographer. The current set of
 <i>QKcartographer_epistasis.py</i> parses QTL Cartographer output files and permits curation of significant QTLs. Optional command to generate scripts for epistasis analysis with R/qtl.
 
 ## Example
-Example set of commands to run the set of scripts in Linux:
+Example of commands to run the set of scripts in Linux for a F2 population:
 ```bash
 python QKcartographer_preprocess.py DxM SF2 DxM_phenotypic_data.txt DxM_genetic_map.txt
 
@@ -32,9 +32,31 @@ bash permutations.sh
 
 python QKcartographer_permutations.py DxM 0.95 1000
 python QKcartographer_visualization.py DxM SF2 0.95
-python QKcartographer_epistasis.py DxM SF2 0.95
+python QKcartographer_epistasis.py SF2 0.95
 ```
-This example uses a genetic map with cM positions generated using the Kosambi function.
+
+Example of commands to run the set of scripts in Linux for a DH population:
+```bash
+python QKcartographer_preprocess.py SxGP RI0 SxGP_phenotypic_data.txt SxGP_genetic_map.txt
+
+mkdir analysis
+
+Rmap -A -i SxGP_Rmap.inp -f 2 -V
+Rcross -A -i SxGP_Rcross.inp -V
+SRmapqtl -A -i qtlcart.cro -t 1000 -u 5 -M 2 -V
+Zmapqtl -A -i qtlcart.cro -t 1000 -M 6 -V
+Eqtl -A -S 8 -H 10 -M 6 -V
+mv qtlcart.eqt analysis/qtlcart_H0H1.eqt
+cp qtlcart.cro qtlcart.map qtlcart.sr qtlcart.z analysis/
+rm qtlcart.sr qtlcart.z
+
+bash permutations.sh
+
+python QKcartographer_permutations.py SxGP 0.95 1000
+python QKcartographer_visualization.py SxGP RI0 0.95
+python QKcartographer_epistasis.py RI0 0.95
+```
+Both examples use a genetic map with cM positions generated using the Kosambi function.
 
 ## Supported population type
 |Design                            |Code      |Example|Description               |
