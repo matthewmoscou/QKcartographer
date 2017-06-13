@@ -10,6 +10,8 @@ A set of scripts for processing output from QTL Cartographer. The current set of
 
 <i>QKcartographer_epistasis.py</i> parses QTL Cartographer output files and permits curation of significant QTLs. Optional command to generate scripts for epistasis analysis with R/qtl.
 
+<i>QKcartographer_segregation.py</i> analyzes the genetic map of a population and generates input files for generating a segregation distortion plot.
+
 ## Example
 Example of commands to run the set of scripts in Linux for a F2 population:
 ```bash
