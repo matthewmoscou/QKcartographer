@@ -12,6 +12,8 @@ A set of scripts for processing output from QTL Cartographer. The current set of
 
 <i>QKcartographer_segregation.py</i> analyzes the genetic map of a population and generates input files for generating a segregation distortion plot.
 
+<i>QKcartographer_phenotypes.py</i> analyzes phenotypic data and generates input files for generating histograms and pairwise plots.
+
 ## Example
 Example of commands to run the set of scripts in Linux for a F2 population:
 ```bash
