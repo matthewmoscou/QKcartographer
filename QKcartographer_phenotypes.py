@@ -114,7 +114,7 @@ for phenotype in phenotypes.keys():
 	R_analysis_file.write('dev.off()' + '\n')
 
 for phenotypic_pair in powersetOfSize(phenotypes.keys(), 2):
-	R_analysis_file.write('png(file="' + args[0] + '_pairwise_' + phenotype + '.png", width=500, height=500)' + '\n')
+	R_analysis_file.write('png(file="' + args[0] + '_pairwise_' + phenotypic_pair[0] + '_' + phenotypic_pair[1] + '.png", width=500, height=500)' + '\n')
 	R_analysis_file.write('ggplot(data, aes(' + phenotypic_pair[0] + ',' + phenotypic_pair[1] + ')) + geom_point()' + '\n')
 	R_analysis_file.write('dev.off()' + '\n')
 
