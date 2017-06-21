@@ -18,6 +18,8 @@ Future improvements to include:
 """
 
 # modules
+import commands
+
 import math
 from math import *
 
@@ -104,7 +106,10 @@ R_input_file.close()
 # all pairwise combinations?
 R_analysis_file = open(args[0] + '_phenotypes_ggplot.R', 'w')
 
+dir_path = os.path.dirname(os.path.realpath(__file__))
+
 R_analysis_file.write('library(ggplot2)' + '\n')
+R_analysis_file.write('setwd("' + dir_path + '")\n')
 R_analysis_file.write('data = read.table(file="' + args[0] + '_phenotypes_ggplot.txt", header=T)' + '\n')
 R_analysis_file.write('data = data.frame(data)' + '\n')
 
@@ -119,3 +124,7 @@ for phenotypic_pair in powersetOfSize(phenotypes.keys(), 2):
 	R_analysis_file.write('dev.off()' + '\n')
 
 R_analysis_file.close()
+
+commands.getstatusoutput('R --vanilla < ' + args[0] + '_phenotypes_ggplot.R > temp.txt')
+commands.getstatusoutput('rm temp.txt')
+

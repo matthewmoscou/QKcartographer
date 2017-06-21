@@ -18,6 +18,8 @@ Future improvements to include:
 """
 
 # modules
+import commands
+
 import math
 from math import *
 
@@ -113,18 +115,23 @@ named_alleles = []
 for allele in alleles:
 	named_alleles.append(allele_name[allele])
 
+dir_path = os.path.dirname(os.path.realpath(__file__))
+
 R_analysis_file = open(args[0] + '_segregation_distortion.R', 'w')
 
 R_analysis_file.write('library(ggplot2)' + '\n')
-
-#R_analysis_file.write('postscript(file="' args[0] + '_segregation_distortion.ps", width=9, height=3)' + '\n')
-R_analysis_file.write('png(file="' + args[0] + '_segregation_distortion.png", width=1500, height=500)' + '\n')
-
+R_analysis_file.write('setwd("' + dir_path + '")\n')
 R_analysis_file.write('data = read.table(file="' + args[0] + '_segregation_distortion.txt", header=T)' + '\n')
 R_analysis_file.write('data = data.frame(data)' + '\n')
 R_analysis_file.write('data$Allele <- factor(data$Allele, levels=c("' + '","'.join(named_alleles) + '"))' + '\n')
+
+#R_analysis_file.write('postscript(file="' args[0] + '_segregation_distortion.ps", width=9, height=3)' + '\n')
+R_analysis_file.write('png(file="' + args[0] + '_segregation_distortion.png", width=1500, height=500)' + '\n')
 R_analysis_file.write('ggplot(data, aes(cM, group=Chromosome)) + geom_line(aes(x=cM, y=Frequency, group=Allele, color=Allele)) + geom_point(aes(x=cM, y=Frequency, color=Allele)) + facet_grid (.~ Chromosome, scales = "free_x", space="free_x") + scale_colour_manual(values = c("' + '","'.join(palette) + '"))' + '\n')
 
 R_analysis_file.write('dev.off()' + '\n')
 
 R_analysis_file.close()
+
+commands.getstatusoutput('R --vanilla < ' + args[0] + '_segregation_distortion.R > temp.txt')
+commands.getstatusoutput('rm temp.txt')
