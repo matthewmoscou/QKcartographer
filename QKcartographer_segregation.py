@@ -34,6 +34,7 @@ import string
 # global variables
 paletteAHB = ["#E69F00", "#939393", "#56B4E9", "#D55E00"]
 paletteAH = ["#E69F00", "#939393", "#D55E00"]
+paletteBH = ["#E69F00", "#939393", "#D55E00"]
 paletteAB = ["#E69F00", "#56B4E9", "#D55E00"]
 color_name = ['Orange', 'Grey', 'Sky blue', 'Vermillion']
 allele_name = {'A':'A', 'H':'H', 'B':'B', '-':'Missing'}
@@ -91,9 +92,12 @@ genetic_map_file.close()
 if args[1] in ['RI0', 'RI1']:
 	alleles = ['A', 'B', '-']
 	palette = paletteAB
-elif args[1][0] in ['B']:
+elif args[1] in ['B1']:
 	alleles = ['A', 'H', '-']
 	palette = paletteAH
+elif args[1] in ['B2']:
+	alleles = ['B', 'H', '-']
+	palette = paletteBH
 elif args[1][0] in ['S']:
 	alleles = ['A', 'H', 'B', '-']
 	palette = paletteAHB
