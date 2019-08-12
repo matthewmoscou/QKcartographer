@@ -320,6 +320,52 @@ for suffix in analysis_traits:
 	R_plot_graph.write('dev.off()' + '\n')
 
 	############################################################################
+	# plot individual graphs for every hypothesis test
+
+	# for replicate datasets, normalize to the maximum_likelihood of the average
+	for hypothesis_index in range(2, len(hypothesis_tests) + 2):
+		# open png or postscript file for LRTS/LOD plot
+		if options.postscript:
+			R_plot_graph.write('postscript(file="' + os.getcwd() + '/figures/' + filename + '_' + trait + '_' + string.replace(hypothesis_tests[hypothesis_index - 2], ':', '') + '_LRTS.ps", width=9, height=3)' + '\n')
+		else:
+			R_plot_graph.write('png(file="' + os.getcwd() + '/figures/' + filename + '_' + trait + '_' + string.replace(hypothesis_tests[hypothesis_index - 2], ':', '') + '_LRTS.png", width=1500, height=500)' + '\n')
+	
+		# plot LRTS/LOD curve of H0:H3
+		R_plot_graph.write('plot(c' + str_vector(cM_positions) + ', c' + str_vector(trait_Zmapqtl[trait][2]) + ', type="n", xlab="", ylab="", main="", axes=F, xlim=c(' + str(max(cM_positions) * 0.038) + ', ' + str(max(cM_positions) * 0.962) + '), ylim=c(0, ' + str(maximum_LOD) + '), col="' + palette[0] + '", lwd=3)' + '\n')
+	
+		# plot experiment-wise threshold (EWT) across chromosomes
+		R_plot_graph.write('lines(c(0, ' + str(max(cM_positions)) + '), c(' + str(trait_hypothesis_likelihood[trait][0]) + ', ' + str(trait_hypothesis_likelihood[trait][0]) + '), col="blue", lwd=3)' + '\n')
+		
+		R_plot_graph.write('box(lwd=3)' + '\n')
+	
+		#R_plot_graph.write('axis(1, at = c' + str_vector(marker_positions) + ', labels=F)' + '\n')
+	
+		data_normalized = []
+		
+		for data_point in trait_Zmapqtl[trait][hypothesis_index]:
+			#print data_point, trait_hypothesis_likelihood[trait][hypothesis_index - 2], trait_hypothesis_likelihood[trait][0]
+			if data_point == 0.0:
+				data_normalized.append(0.0)
+			else:
+				data_normalized.append(data_point / (float(trait_hypothesis_likelihood[trait][hypothesis_index - 2]) / float(trait_hypothesis_likelihood[trait][0])))
+
+		R_plot_graph.write('lines(c' + str_vector(cM_positions) + ', c' + str_vector(data_normalized) + ', col="' + palette[hypothesis_index - 2] + '", lwd=3)' + '\n')
+
+
+		chr_old = string.split(trait_Zmapqtl[trait][0][0], '.')[0]
+		
+		# determine chromosome positions
+		for position in trait_Zmapqtl[trait][0]:
+			chr_current = string.split(position, '.')[0]
+			
+			if chr_current != chr_old:
+				R_plot_graph.write('lines(c(' + str(cM_positions[trait_Zmapqtl[trait][0].index(position)]) + ', ' + str(cM_positions[trait_Zmapqtl[trait][0].index(position)]) + '), c(' + str(maximum_LOD * -0.04) + ', ' + str(maximum_LOD * 1.04) + '), col="black", lwd=3)' + '\n')
+	
+			chr_old = chr_current
+	
+		R_plot_graph.write('dev.off()' + '\n')
+
+	############################################################################
 
 	# open PNG file for additivity plot
 	if options.postscript:
